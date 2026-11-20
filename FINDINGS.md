@@ -490,7 +490,7 @@ Decisions recorded in the code (all named fatals where not modelled):
   hash; other key lengths fatal.
 - wprintf `_p` forms: positional arguments fatal until supported.
 
-## Stopped: fibers (2026-11-20)
+## Fibers (2026-11-20)
 
 After the splash, `GetFileAttributes(Ex)A` (x86recomp `a163f5c`), the engine
 calls `kernel32!ConvertThreadToFiber` (return `0x10611555`) on the main
@@ -515,3 +515,32 @@ StackBase/Limit). Options:
   per-thread runtime state) must follow the logical thread across host
   threads; each switch costs a thread hand-off (microseconds).
 - A hand-written context switch: against x86recomp's no-assembly rule.
+
+Decision (user): ucontext on the same thread. Implemented in x86recomp
+`290a61c` (platform host contexts + kernel32 fibers; host_context_test).
+The engine's fibers then run: ConvertThreadToFiber on the main thread,
+CreateFiber, a worker CreateThread, SwitchToFiber, and startup goes on.
+
+## Milestone 3 done: D3D9 device created (2026-11-20)
+
+x86recomp `metal-rails/m3-crt32` at `b7b6039` (`a163f5c`
+GetFileAttributesExA, `290a61c` fibers, `b7b6039` MonitorFromWindow /
+GetMonitorInfoA); ctest 51/51 at each commit.
+
+After the fibers: COM + WMI hardware queries (CoCreateInstance,
+IWbemLocator::ConnectServer, CreateInstanceEnum), GlobalMemoryStatusEx,
+then the renderer:
+- `Direct3DCreate9(32)`, `GetAdapterIdentifier`, `GetAdapterModeCount` /
+  `EnumAdapterModes`, `AdjustWindowRect`, `MonitorFromWindow` /
+  `GetMonitorInfoA`.
+- **Main window:** class `railworks`, title "Train Simulator", WS_POPUP
+  640x480, then `SetWindowPos`.
+- `CheckDepthStencilMatch`, `CheckDeviceMultiSampleType`,
+  **`IDirect3D9::CreateDevice` -> D3D_OK**: 3024x1964 (the host's native
+  mode, from the enumerated modes), D3DFMT_A8R8G8B8, fullscreen, auto
+  depth D3DFMT_D24S8, D3DPRESENT_INTERVAL_IMMEDIATE, behaviour 0x40
+  (hardware vertex processing) without FPU_PRESERVE, so the x87 goes to
+  single precision (CW 027F -> 007F) as on Windows. Backend: x86recomp's
+  generic `SDL_GPU (metal)`.
+- Then `GetRenderTarget`, `GetDepthStencilSurface`, and the next stop:
+  **`IDirect3DDevice9::CreateStateBlock`** (milestone 4, the renderer).
