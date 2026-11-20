@@ -1,0 +1,30 @@
+image_base 0x00400000  image_size 0x61000  entry 0x0040181c  timestamp 0x68f73ebb
+relocations: NONE (fixed base)
+sections:
+  .text    va 0x00401000 vsize    0x142b raw    0x1600 chars 0x60000020
+  .rdata   va 0x00403000 vsize    0x1186 raw    0x1200 chars 0x40000040
+  .data    va 0x00405000 vsize     0x4ac raw     0x200 chars 0xc0000040
+  .rsrc    va 0x00406000 vsize   0x5a9b8 raw   0x5aa00 chars 0x40000040
+imports per dll:
+  KERNEL32.dll   25
+  USER32.dll     3
+  VCRUNTIME140.dll 10
+  api-ms-win-crt-string-l1-1-0.dll 2
+  api-ms-win-crt-runtime-l1-1-0.dll 17
+  api-ms-win-crt-math-l1-1-0.dll 1
+  api-ms-win-crt-stdio-l1-1-0.dll 2
+  api-ms-win-crt-locale-l1-1-0.dll 1
+  api-ms-win-crt-heap-l1-1-0.dll 4
+exports: 0 
+rich header (prodid build count):
+  147 30729 12
+  257 33030 2
+  261 33030 25
+  260 33030 12
+  259 33030 2
+  257 29395 5
+    1     0 69
+  261 33145 1
+  255 33145 1
+  151     0 1
+  258 33145 1

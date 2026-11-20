@@ -1,0 +1,34 @@
+# Derived from the player's game files: never committed. (symbols/ is: the
+# functions' addresses and names, which the lifter needs.)
+generated/
+ghidra/
+*.gpr
+*.rep/
+*.lock
+*.lock~
+out/
+run/
+logs/
+# Game binaries and data, should any ever land in the tree by mistake.
+*.exe
+*.dll
+*.EXE
+*.DLL
+*.pdb
+*.fx
+*.swf
+*.pak
+*.ap
+*.bin
+*.GeoPcDx
+*.TgPcDx
+*.dds
+# x86recomp (vendor/x86recomp at the commit pinned in X86RECOMP).
+vendor/
+# Local machine settings (game path, Ghidra path).
+tools/local.env
+config.local.json
+CMakeUserPresets.json
+__pycache__/
+.DS_Store
+*.log

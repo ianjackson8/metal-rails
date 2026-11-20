@@ -1,0 +1,81 @@
+image_base 0x10000000  image_size 0x1f07000  entry 0x10e29edc  timestamp 0x68f73eb4
+relocations: yes
+tls: raw 0x1115758c-0x11157594 index_va 0x11bb6a44 callbacks_va 0x10fad174
+sections:
+  .text    va 0x10001000 vsize  0xfa22af raw  0xfa2400 chars 0x60000020
+  .rdata   va 0x10fa4000 vsize  0x1d0994 raw  0x1d0a00 chars 0x40000040
+  .data    va 0x11175000 vsize  0xc9114c raw   0xb4c00 chars 0xc0000040
+  .rsrc    va 0x11e07000 vsize     0x978 raw     0xa00 chars 0x40000040
+  .reloc   va 0x11e08000 vsize   0xfee84 raw   0xff000 chars 0x42000040
+imports per dll:
+  WINMM.dll      3
+  d3d9.dll       3
+  GDI32.dll      12
+  SHELL32.dll    9
+  VERSION.dll    3
+  RPCRT4.dll     4
+  steam_api.dll  13
+  KERNEL32.dll   140
+  USER32.dll     68
+  ADVAPI32.dll   18
+  ole32.dll      4
+  OLEAUT32.dll   2
+  zlibwapi.dll   17
+  LocalisedStrings.dll 5
+  WS2_32.dll     30
+  gdiplus.dll    11
+  MSVCP140.dll   144
+  SHLWAPI.dll    8
+  urlmon.dll     1
+  VCRUNTIME140.dll 32
+  api-ms-win-crt-runtime-l1-1-0.dll 31
+  api-ms-win-crt-math-l1-1-0.dll 33
+  api-ms-win-crt-time-l1-1-0.dll 10
+  api-ms-win-crt-heap-l1-1-0.dll 10
+  api-ms-win-crt-string-l1-1-0.dll 49
+  api-ms-win-crt-convert-l1-1-0.dll 15
+  api-ms-win-crt-stdio-l1-1-0.dll 47
+  api-ms-win-crt-multibyte-l1-1-0.dll 1
+  api-ms-win-crt-filesystem-l1-1-0.dll 7
+  api-ms-win-crt-environment-l1-1-0.dll 2
+  api-ms-win-crt-utility-l1-1-0.dll 3
+  api-ms-win-crt-locale-l1-1-0.dll 4
+  DINPUT8.dll    1
+  d3dx9_43.dll   38
+  COMCTL32.dll   1
+  PhysXLoader.dll 2
+  PhysXCooking.dll 3
+  OpenAL32.dll   35
+  XINPUT1_4.dll  2
+  COMDLG32.dll   2
+exports: 36 func=36
+rich header (prodid build count):
+  253 33030 1
+  260 33030 10
+  259 33030 13
+  257 33030 4
+  257 29395 2
+  261 33030 30
+  171 40219 230
+  170 40219 63
+  257 33145 2
+  156 30319 2
+  260 33145 2
+  257 30145 2
+  203 65501 8
+  261 24215 5
+  261 32825 116
+  110 50727 1
+    4  8447 2
+  260 31995 1
+  260 32217 26
+  147 30729 30
+  156 21202 2
+  257 31995 27
+    1     0 823
+  265 33145 2
+  261 33145 1187
+  256 33145 1
+  255 33145 1
+  151     0 1
+  258 33145 1

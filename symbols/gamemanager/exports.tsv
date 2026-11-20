@@ -1,0 +1,37 @@
+va	kind	mangled	demangled
+104B6B90	func	??_FSysAllocStatic@Scaleform@@QAEXXZ	public: void __thiscall Scaleform::SysAllocStatic::`default ctor closure'(void)
+104B6D10	func	??0System@Scaleform@@QAE@PAVSysAllocBase@1@@Z	public: __thiscall Scaleform::System::System(class Scaleform::SysAllocBase *)
+104B6D70	func	??0System@Scaleform@@QAE@ABUHeapDesc@MemoryHeap@1@PAVSysAllocBase@1@@Z	public: __thiscall Scaleform::System::System(struct Scaleform::MemoryHeap::HeapDesc const &, class Scaleform::SysAllocBase *)
+104B6D90	func	??1System@Scaleform@@QAE@XZ	public: __thiscall Scaleform::System::~System(void)
+104B6DA0	func	?Init@System@Scaleform@@SAXPAVSysAllocBase@2@@Z	public: static void __cdecl Scaleform::System::Init(class Scaleform::SysAllocBase *)
+104B6E00	func	??_FSystem@Scaleform@@QAEXXZ	public: void __thiscall Scaleform::System::`default ctor closure'(void)
+104B6EC0	func	??_FSysAllocPagedMalloc@Scaleform@@QAEXXZ	public: void __thiscall Scaleform::SysAllocPagedMalloc::`default ctor closure'(void)
+104B6ED0	func	??1AcquireInterface@Scaleform@@UAE@XZ	public: virtual __thiscall Scaleform::AcquireInterface::~AcquireInterface(void)
+104B6F50	func	??1DefaultAcquireInterface@Scaleform@@UAE@XZ	public: virtual __thiscall Scaleform::DefaultAcquireInterface::~DefaultAcquireInterface(void)
+104B6FD0	func	??_FMutex@Scaleform@@QAEXXZ	public: void __thiscall Scaleform::Mutex::`default ctor closure'(void)
+104B6FE0	func	??_FEvent@Scaleform@@QAEXXZ	public: void __thiscall Scaleform::Event::`default ctor closure'(void)
+104B6FF0	func	??_FSemaphore@Scaleform@@QAEXXZ	public: void __thiscall Scaleform::Semaphore::`default ctor closure'(void)
+104B7000	func	??_FThread@Scaleform@@QAEXXZ	public: void __thiscall Scaleform::Thread::`default ctor closure'(void)
+104B7010	func	??_FSysAllocWinAPI@Scaleform@@QAEXXZ	public: void __thiscall Scaleform::SysAllocWinAPI::`default ctor closure'(void)
+104B7020	func	?Init@System@GFx@Scaleform@@SAXPAVSysAllocBase@3@@Z	public: static void __cdecl Scaleform::GFx::System::Init(class Scaleform::SysAllocBase *)
+104C2B30	func	?SetIdentity@?$Matrix2x4@M@Render@Scaleform@@QAEXXZ	public: void __thiscall Scaleform::Render::Matrix2x4<float>::SetIdentity(void)
+104C2B70	func	?GetXScale@?$Matrix2x4@M@Render@Scaleform@@QBEMXZ	public: float __thiscall Scaleform::Render::Matrix2x4<float>::GetXScale(void) const
+104C2BD0	func	?GetYScale@?$Matrix2x4@M@Render@Scaleform@@QBEMXZ	public: float __thiscall Scaleform::Render::Matrix2x4<float>::GetYScale(void) const
+104C2C30	func	?SetIdentity@?$Matrix3x4@M@Render@Scaleform@@QAEXXZ	public: void __thiscall Scaleform::Render::Matrix3x4<float>::SetIdentity(void)
+104C2C90	func	?SetIdentity@?$Matrix4x4@M@Render@Scaleform@@QAEXXZ	public: void __thiscall Scaleform::Render::Matrix4x4<float>::SetIdentity(void)
+104C4B10	func	?Prepend@?$Matrix2x4@M@Render@Scaleform@@QAEAAV123@ABV123@@Z	public: class Scaleform::Render::Matrix2x4<float> & __thiscall Scaleform::Render::Matrix2x4<float>::Prepend(class Scaleform::Render::Matrix2x4<float> const &)
+104D7720	func	RWInit	
+104D7810	func	RWInitForWrapper	
+104D7960	func	RWRun	
+104D7B10	func	RWShutdown	
+104D7CB0	func	RWGetSystemScore	
+104D7CC0	func	RWTestCurrentSettings	
+1075EAF0	func	EnginePluginSingletonInitialise	
+109E0F20	func	ParticleManagerPluginSingletonInitialise	
+109E0F50	func	ParticleManagerPluginFactoryInitialise	
+10B651E0	func	SkyDomePluginSingletonInitialise	
+10B65210	func	SkyDomePluginFactoryInitialise	
+10B8F720	func	TrafficManagerPluginSingletonInitialise	
+10B8F750	func	TrafficManagerPluginFactoryInitialise	
+10B8F780	func	PlatformManagerPluginSingletonInitialise	
+10B8F7B0	func	PlatformManagerPluginFactoryInitialise	

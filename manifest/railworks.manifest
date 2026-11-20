@@ -1,0 +1,4 @@
+# RailWorks.exe (v79.0a, SHA-256 2cc701c6...6486c): this port's changes to
+# the lifted stub. Grammar: vendor/x86recomp ARCHITECTURE.md / CLAUDE.md
+# (entry | name | probe | resume | setjmp | replace | hook), guest VAs in hex.
+# Empty until milestone 2's lift says what is needed.
