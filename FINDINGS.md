@@ -544,3 +544,32 @@ then the renderer:
   generic `SDL_GPU (metal)`.
 - Then `GetRenderTarget`, `GetDepthStencilSurface`, and the next stop:
   **`IDirect3DDevice9::CreateStateBlock`** (milestone 4, the renderer).
+
+## Milestone 4 (in progress, 2026-11-20): to D3DX
+
+- `X86RECOMP` pinned to `metal-rails/m3-crt32` `b7b6039` (`df90e80`); the
+  default build reads `STEAMWORKS_SDK` from `tools/local.env`.
+- **Renderer: x86recomp's own Metal device** (Liberty's), the default via
+  `RAILWORKS_GFX=metal` (`6a53472`): "gfx: Metal (Apple M5 Pro)", back
+  buffer 3024x1964. Its shader caches (`~/Library/Caches/x86recomp`) are
+  shared by every game on the runtime and keyed by content: GTA IV's 603
+  shaders / 380 pipelines load but are never used here (at most prewarm
+  time).
+- x86recomp branch `metal-rails/m4-render` (fork; `2368fd6` D3D9 state
+  blocks, `724412f` RTTI casts with rtti_test, `aea7955` aligned
+  allocation; each builds, ctest 51-52).
+- `tools/complete_jumptables.py` (`2a963dc`, own code): one engine switch
+  (`10EE47EE`) had no bounds check and an empty Ghidra table.
+- Trace after CreateDevice: CreateStateBlock, GetDeviceCaps, CreateQuery,
+  `dynamic_cast`, a vertex declaration and shader, textures (created,
+  locked, filled), `typeid`, then **`d3dx9_43!D3DXCreateBox`** (an
+  ID3DXMesh).
+
+D3DX: the engine uses 38 functions (ID3DXEffect over fx_2_0 binaries,
+meshes, sprite, font, line, texture loading, shader compile/assemble).
+Microsoft's `d3dx9_43.dll` (x86, 2 MB, 1.8 MB code) is on this Mac in the
+Steam client's DirectX redistributable (`Steamworks Shared/_CommonRedist/
+DirectX/Jun2010/Jun2010_d3dx9_43_x86.cab`, with D3DCompiler_43). Its
+imports: msvcrt.dll 85 (x86recomp has no msvcrt HLE), KERNEL32 76 (7
+missing), GDI32 27 (16 missing: glyph outlines, DIB sections, text),
+ADVAPI32 3 (1 missing). Decision needed: lift it, or reimplement D3DX.
