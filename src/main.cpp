@@ -40,6 +40,12 @@ int main(int argc, char** argv) {
   }
   while (game_dir.size() > 1 && game_dir.back() == '/') game_dir.pop_back();
   if (const char* t = std::getenv("RAILWORKS_TRACE")) recomp::g_trace = *t && *t != '0';
+#if defined(__APPLE__)
+  // The D3D9 HLE draws through x86recomp's own Metal renderer (as Liberty
+  // Pro Max does), not the generic SDL_GPU backend; RAILWORKS_GFX=gpu in
+  // the environment still picks the latter.
+  setenv("RAILWORKS_GFX", "metal", 0);
+#endif
 
   const std::string exe = game_dir + "/RailWorks.exe";
   struct stat st;
