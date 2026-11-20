@@ -9,9 +9,6 @@
 #   RAILWORKS_GAME_DIR  the game folder (read only)
 #   GHIDRA_HOME         Ghidra install (the folder with support/analyzeHeadless)
 #   JAVA_HOME           JDK 21+ for Ghidra 12 (optional if java on PATH is one)
-#   LIBERTY_DIR         optional: ../liberty-pro-max, whose GPLv3
-#                       tools/complete_jumptables.py fills switch tables Ghidra
-#                       left empty (called from there, not copied here)
 set -euo pipefail
 here=$(cd "$(dirname "$0")/.." && pwd)
 [ -f "$here/tools/local.env" ] && . "$here/tools/local.env"
@@ -48,10 +45,9 @@ run() {
     -postScript ExportJumpTables.java "$here/symbols/$mod/jumptables.tsv" \
     -log "$L/ghidra-$mod.log" > "$L/ghidra-$mod.out" 2>&1 || rc=$?
   echo "rc=$rc $(grep -h -E "ExportFunctions:|ExportJumpTables:" "$L/ghidra-$mod.out" | tr "\n" " ")"
-  if [ -n "${LIBERTY_DIR:-}" ] && [ -f "$LIBERTY_DIR/tools/complete_jumptables.py" ]; then
-    rm -f "$here/symbols/$mod/jumptables.tsv.ghidra"
-    python3 -I "$LIBERTY_DIR/tools/complete_jumptables.py" "$file" "$here/symbols/$mod/jumptables.tsv"
-  fi
+  # Switch tables Ghidra left empty that have no bounds check for the
+  # lifter to size them by (tools/complete_jumptables.py).
+  python3 -I "$here/tools/complete_jumptables.py" "$file" "$here/symbols/$mod"
 }
 run railworks RailWorks.exe
 run gamemanager plugins/GameManagerVC.dll
