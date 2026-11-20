@@ -489,3 +489,29 @@ Decisions recorded in the code (all named fatals where not modelled):
 - CryptoAPI: RC4 128-bit default key (Microsoft Strong provider) = the MD5
   hash; other key lengths fatal.
 - wprintf `_p` forms: positional arguments fatal until supported.
+
+## Stopped: fibers (2026-11-20)
+
+After the splash, `GetFileAttributes(Ex)A` (x86recomp `a163f5c`), the engine
+calls `kernel32!ConvertThreadToFiber` (return `0x10611555`) on the main
+thread. Its fiber use is one small class (2 call sites each for
+ConvertThreadToFiber, CreateFiber, SwitchToFiber, DeleteFiber): init
+(`0x10611530`) is `CreateFiber(size, 0x106115C0, this)` or, with no size,
+`ConvertThreadToFiber(this)`, the handle at `+0x14`; the start routine
+calls a virtual method then switches back; teardown is DeleteFiber. How
+often it switches is not known until it runs.
+
+Lifted code runs guest functions as host functions, so a fiber needs its
+own host stack as well as its guest stack (and TEB FiberData at fs:[0x10],
+StackBase/Limit). Options:
+- ucontext (`makecontext`/`swapcontext`) in the platform layer: same host
+  thread, so thread identity, thread-locals, x87/SSE state and TLS stay as
+  on Windows; cheap switches. Tested on this Mac (arm64, macOS 27): works
+  (4 MB stack, thread_local intact, deep recursion, a C++ exception thrown
+  and caught inside the fiber), but Apple marks the API deprecated, "No
+  longer supported".
+- One host thread per fiber with a strict hand-off (only one runs): no
+  deprecated API, but the guest-visible thread (TEB, id, TLS, last error,
+  per-thread runtime state) must follow the logical thread across host
+  threads; each switch costs a thread hand-off (microseconds).
+- A hand-written context switch: against x86recomp's no-assembly rule.
