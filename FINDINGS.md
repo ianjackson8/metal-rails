@@ -279,11 +279,12 @@ handled by design (no catch-alls), in this order:
    end) and the remaining modules (OpenAL, zlib, Steam bridge, PhysX as
    lifted modules) toward the Scaleform main menu.
 
-## Milestone 3 step 1: upstream x86recomp changes (prepared 2026-11-20, not committed)
+## Milestone 3 step 1: upstream x86recomp changes (committed 2026-11-20)
 
-In the worktree `vendor/x86recomp-m3` (branch `metal-rails/m3-step1`,
-from `2461249e`), uncommitted pending review; the `X86RECOMP` pin is
-unchanged. Three independent changes (each applies alone to `2461249e`):
+Branch `metal-rails/m3-step1` from `2461249e`, three SSH-signed commits
+(`17aef3f`, `72846ac`, `2b5e819`), pushed to the fork
+github.com/ianjackson8/x86recomp; `X86RECOMP` now pins `2b5e819`.
+Three independent changes (each applies alone to `2461249e`):
 
 1. **Static TLS in lifted 32-bit DLLs** (`process.cpp`, `runtime.h`,
    ARCHITECTURE.md): the `!p.x64` refusal is removed; the existing slot

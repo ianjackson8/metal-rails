@@ -12,7 +12,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
 
 # x86recomp: the lifter, x87 model and runtime (vendor/x86recomp, the
-# commit pinned in X86RECOMP, on Awis13/x86recomp's `liberty` branch).
+# commit pinned in X86RECOMP: ianjackson8/x86recomp, a fork of
+# Awis13/x86recomp's `liberty` branch).
 set(X86RECOMP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/x86recomp"
     CACHE PATH "x86recomp source tree")
 if(NOT EXISTS "${X86RECOMP_DIR}/CMakeLists.txt")

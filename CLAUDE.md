@@ -97,8 +97,11 @@ The game is still patched by Dovetail, so the port targets one build:
 
 Repo: `../liberty-pro-max` (github.com/Awis13/liberty-pro-max).
 
-- **x86recomp** is pinned in `X86RECOMP` (`liberty` branch of
-  Awis13/x86recomp, commit `2461249e...`), vendored at `vendor/x86recomp`.
+- **x86recomp** is pinned in `X86RECOMP` (`branch commit repo-url`):
+  this project's fork github.com/ianjackson8/x86recomp, branch
+  `metal-rails/m3-step1` (commit `2b5e8193...`), vendored at
+  `vendor/x86recomp`. The fork is Liberty's base (Awis13/x86recomp,
+  `liberty` branch, commit `2461249e`) plus metal-rails' signed changes.
   That branch carries the Metal renderer, audio mixer and Windows layer.
   Upstream: github.com/JTM-rootstorm/x86recomp.
 - **Pipeline:** `symbols/` (function addresses + names from Ghidra,
