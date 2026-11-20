@@ -438,3 +438,54 @@ the real one.
 - Trace: `SteamAPI_RestartAppIfNecessary` -> 0, `SteamAPI_Init` -> 1
   (client loaded, ownership confirmed), `SteamAPI_RegisterCallback`, then
   the engine continues to `_time64` (HLE64_ONLY: next CRT item).
+
+## Milestone 3: trace to the first window (2026-11-20)
+
+x86recomp branch `metal-rails/m3-crt32` on the fork, now at `6fd46ba`
+(signed commits after `d45387a`: `8f7b961` Steam callback repacking,
+`c11fdeb` UCRT time/conversion/wide printf/error handlers, `625ec5c` INI
+files and W window functions, `af0cffd` CryptoAPI, `8d29a25` Steam
+interface methods, `6fd46ba` file bitmaps and GetObjectA); every commit
+builds and passes its ctest (47-50). `X86RECOMP` still pins `2b5e819`.
+
+Steam callbacks: libsteam_api delivers structs packed to 4, the guest wants
+8. `tools/steam_callbacks.py` has clang lay the 1.53a headers out for
+`i686-pc-windows-msvc`: 186 callback structs (14 HTML-surface ones with
+pointers left out); all 27 the engine registers are covered, and their
+guest sizes equal the engine's own `GetCallbackSizeBytes` constants (MSVC's
+`sizeof`), 27 of 27.
+
+The trace, in order (`logs/startup-trace-crt32.log`, ~182 distinct
+imports), after Steam init:
+- Engine setup: `_time64`, string building, `GetSystemInfo`, module path,
+  `_wtoi`/`iswdigit` (command line or version parsing), wide `swprintf`.
+- **CrashRpt** (statically linked crash reporter): reads
+  `data\CrashReport\Win32\crashrpt_lang.ini` (GetPrivateProfileStringW),
+  `LoadLibraryW`/`FreeLibrary`, creates its directory, a GUID
+  (`CoCreateGuid` + rpcrt4 string), an event and a file mapping, then
+  installs every CRT error handler (`_set_error_mode` ... `set_unexpected`).
+- Steam: `ISteamUser::GetSteamID`; a **CryptoAPI** round (PROV_RSA_FULL
+  verify context, MD5 of data, RC4 key derived from it, `CryptEncrypt`);
+  `ISteamClient` (`SetWarningMessageHook`),
+  `ISteamUtils::SetOverlayNotificationPosition`,
+  `ISteamApps::GetCurrentGameLanguage`.
+- **First window: the splash.** `LoadImageA(NULL,
+  "data\textures\frontend\TSC Splash Screen x32.bmp", IMAGE_BITMAP, 0, 0,
+  LR_LOADFROMFILE)` (600x200, 32-bit BI_RGB, bottom-up), `GetObjectA` (24-byte
+  BITMAP), `RegisterClassA("railworksinit")`, `GetSystemMetrics`,
+  `CreateWindowExA(WS_POPUP, 600x200 at 212,284)` with a child
+  `STATIC` (`WS_CHILD|WS_VISIBLE|SS_BITMAP`, given the bitmap with
+  `SendMessageA`), `ShowWindow`, `UpdateWindow`, then the message pump
+  (`PeekMessageA`). The window is created and shown but **blank**: x86recomp's
+  GDI is query-only, so the static control paints nothing.
+- Next stop after the splash: `kernel32!GetFileAttributesExA`.
+
+Decisions recorded in the code (all named fatals where not modelled):
+- CRT error handlers are recorded and returned, never called (the
+  conditions are fatal errors here).
+- Steam's warning hook is not called (the client may call it on any
+  thread); warnings go to stderr.
+- `iswdigit/iswspace/iswalnum`: exact for ASCII, fatal beyond it.
+- CryptoAPI: RC4 128-bit default key (Microsoft Strong provider) = the MD5
+  hash; other key lengths fatal.
+- wprintf `_p` forms: positional arguments fatal until supported.
