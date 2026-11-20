@@ -16,6 +16,16 @@ set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
 # Awis13/x86recomp's `liberty` branch).
 set(X86RECOMP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/x86recomp"
     CACHE PATH "x86recomp source tree")
+# The Steamworks SDK for the steam_api bridge (x86recomp's recomp_steam):
+# RECOMP_STEAMWORKS_SDK, else STEAMWORKS_SDK from tools/local.env (untracked:
+# a local path). Version 1.53a: its interface versions are the game's.
+if(NOT RECOMP_STEAMWORKS_SDK AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tools/local.env")
+  file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/tools/local.env" _sdk REGEX "^STEAMWORKS_SDK=")
+  if(_sdk)
+    string(REGEX REPLACE "^STEAMWORKS_SDK=\"?([^\"]*)\"?$" "\\1" _sdk "${_sdk}")
+    set(RECOMP_STEAMWORKS_SDK "${_sdk}" CACHE PATH "Steamworks SDK sdk/ directory")
+  endif()
+endif()
 if(NOT EXISTS "${X86RECOMP_DIR}/CMakeLists.txt")
   message(FATAL_ERROR "no x86recomp in ${X86RECOMP_DIR}: clone the commit in X86RECOMP there")
 endif()

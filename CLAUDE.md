@@ -99,7 +99,7 @@ Repo: `../liberty-pro-max` (github.com/Awis13/liberty-pro-max).
 
 - **x86recomp** is pinned in `X86RECOMP` (`branch commit repo-url`):
   this project's fork github.com/ianjackson8/x86recomp, branch
-  `metal-rails/m3-step1` (commit `2b5e8193...`), vendored at
+  `metal-rails/m3-crt32` (commit `b7b60398...`), vendored at
   `vendor/x86recomp`. The fork is Liberty's base (Awis13/x86recomp,
   `liberty` branch, commit `2461249e`) plus metal-rails' signed changes.
   That branch carries the Metal renderer, audio mixer and Windows layer.
