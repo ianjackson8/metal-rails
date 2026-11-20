@@ -322,3 +322,119 @@ Tests (M5 Pro, macOS 27.0):
     implementation-defined (Rosetta's need not match the modelled
     table); `fisttp` and the ymm stores are suspected harness/state
     limits under Rosetta, unverified.
+
+## Milestone 3 step 2: startup trace (2026-11-20)
+
+x86recomp `2b5e819`, re-lift: 379 unimplemented sites (was 385). Game
+target `railworks` (`src/main.cpp`: `GameConfig` with
+`lifted_dlls = {"plugins\\GameManagerVC.dll"}`, guest dir
+`C:\Program Files (x86)\Steam\steamapps\common\RailWorks`), linked with
+`recomp_runtime`, `recomp_d3d9`, `recomp_xinput`, `recomp_dinput8` only.
+`recomp_ucrt` is deliberately **not** linked: its handlers are x64-only
+and would bind and misbehave silently on this 32-bit guest. Release build
+1 min 46 s wall (764 steps), binary 143 MB.
+
+Run (`RAILWORKS_TRACE=1`, `logs/startup-trace.log`):
+- Both modules map (no `--base`); 613 imports unbound at load (the static
+  gap plus the CRT); `xinput1_4` binds (alias works).
+- The stub's `mainCRTStartup` calls `GetSystemTimeAsFileTime`,
+  `GetCurrentThreadId`, `GetCurrentProcessId`, `QueryPerformanceCounter`
+  (security cookie), `IsProcessorFeaturePresent`, then stops:
+  **`FATAL: unimplemented import ucrtbase.dll!_initterm_e`** (return
+  address `0x004016F6`, stub). The engine DLL is never loaded.
+- So the first blocker is the 32-bit UCRT, in the 5 KB stub. Next unit of
+  work: the stub's 28 UCRT/VCRUNTIME imports correct for 32-bit guests,
+  until the stub reaches `LoadLibrary("plugins\\GameManagerVC.dll")`.
+
+## Milestone 3 step 3: 32-bit CRT, first pass (2026-11-20, in progress)
+
+Upstream work on branch `metal-rails/m3-crt32` of the fork (worktree
+`vendor/x86recomp-crt32`, stacked on `m3-step1`): four signed commits
+`17b2c36` (per-width HLE audit), `76abf1c` (CRT for 32-bit guests),
+`ee86d4c` (rpcrt4/shlwapi/DosDateTimeToFileTime), `d45387a` (Steam
+bridge, first stage); each builds and passes its ctest (45, 46, 47, 47).
+`X86RECOMP` still pins `2b5e819`; the game builds against the branch in
+`out/build/crt32` (`-DX86RECOMP_DIR`). Two new portable tests: `ucrt_fp`,
+`shlwapi_path`.
+
+x86recomp changes:
+- **Two-sided HLE audit:** `Def::x86` + `HLE64_ONLY`; a 32-bit call into a
+  handler audited for x64 only is fatal and named (the mirror of the
+  existing x64 guard). Every UCRT/MSVCP140/VCRUNTIME handler starts as
+  `HLE64_ONLY` and is promoted to `HLE64` once audited for both widths;
+  `recomp_ucrt` is then safe to link for 32-bit guests (metal-rails links
+  it only when the x86recomp tree has `HLE64_ONLY`).
+- Pointer-width aware: `GuestStrings`, onexit tables, `_initterm(_e)`,
+  argv/environ, `__std_exception_copy/destroy`, `__current_exception*`,
+  `StrTo` (endptr), `type_info` compare.
+- `ArgD/ArgF/RetD/RetF` width-aware: 32-bit doubles from stack slots,
+  results pushed exactly onto the x87 stack (`LoadF64/F32`).
+- printf: 32-bit `va_list` (4-byte slots, 8 for 64-bit ints and doubles),
+  `%p` 8 digits, `%z/%t/%I` 32-bit; the `__int64 options` argument's two
+  slots.
+- New: `_controlfp_s` (x87 CW + MXCSR, `ucrt_fp.h`, unit-tested on
+  documented constants, mutation-checked), `_isnan`, `strncat`, a string /
+  wide-string / ctype batch ("C" locale), `srand`, `_getcwd`,
+  `__std_type_info_name` (undname formatting via `UndnameTypeName`; all
+  2,930 engine RTTI names demangle, **not yet diffed against Microsoft's
+  output**), rpcrt4 UUID functions, 7 shlwapi path helpers
+  (`shlwapi_path.h`, unit-tested on the documentation's examples),
+  `DosDateTimeToFileTime`. ~110 handlers audited/promoted for 32-bit.
+
+metal-rails changes: two more lifted modules, both relocated because they
+share the engine's preferred base `0x10000000`:
+- `LocalisedStrings.dll` (SHA-256 `750cab94...b1d2`) at `0x12000000`:
+  375 functions; the engine loads it lazily and binds 5 functions with
+  GetProcAddress (a refused LoadLibrary left null pointers: "indirect
+  branch to 00000000").
+- `zlibwapi.dll` (zlib + **minizip**, SHA-256 `9f8729ac...bf90`) at
+  `0x12100000`: 526 functions; the engine and LocalisedStrings import
+  minizip by ordinal (#61-72 `unz*`, #80-84 `zip*`, #100/127/128), so it is
+  lifted rather than reimplemented. Its 67 KERNEL32 imports were all
+  covered already. 39 new unimplemented sites are inflate's message
+  strings and bit-mask tables in `.text` (junk decodes).
+- Lift: 4 modules, 110,535 functions, 4.85 M instructions, 419
+  unimplemented sites (379 + 1 `xgetbv` + 39 zlib data), 59 s.
+
+Trace now (`logs/startup-trace-crt32.log`), 102 distinct imports:
+stub CRT startup -> `_controlfp_s(NULL, _PC_53, _MCW_PC)` -> WinMain
+(single-instance check, plugin search) -> `LoadLibraryA` -> DllMain of
+zlibwapi, LocalisedStrings, GameManagerVC (CRT init, RTTI names, SRW locks,
+UUIDs) -> engine startup: path setup (shlwapi), file mapping,
+LocalisedStrings reads `Languages\en.lan` (252,196 bytes) -> **stops at
+`steam_api.dll!SteamAPI_RestartAppIfNecessary`**.
+
+Known runtime issue (pre-existing, x86recomp): after a fatal on a deep
+host stack, `FatalReport`'s `backtrace()` faults (`__thread_stack_pcs`),
+giving a second "SIGSEGV ... (runtime bug)" report. The first fatal is
+the real one.
+
+## Steam bridge, first stage (2026-11-20)
+
+- SDK: **Steamworks 1.53a** (user's download, outside the repo;
+  `STEAMWORKS_SDK` in `tools/local.env`). Its headers declare all ten
+  interface versions the game's `steam_api.dll` was built with
+  (`SteamClient020`, `SteamUser021`, `SteamFriends017`, `SteamUtils010`,
+  `STEAMAPPS008`, `STEAMUSERSTATS012`, `SteamInput006`,
+  `SteamController008`, `STEAMUGC016`, `STEAMREMOTESTORAGE016`); its
+  `libsteam_api.dylib` is universal (i386, x86_64, arm64). SDK 1.65's
+  versions are all one step newer, so 1.53a serves as headers and library.
+- Native probe (arm64, Steam running): `SteamAPI_Init` with
+  `SteamAppId=24010` succeeds; the client serves all six old versions;
+  `BLoggedOn` 1, `GetAppID` 24010, `BIsSubscribedApp(24010)` 1, language
+  english, 81 DLC. libsteam_api prints the user's Steam ID to stdout during
+  init, so game logs contain it (`logs/` is untracked).
+- Verified from the engine binary: the guest's `CCallbackBase` vtable is
+  MSVC's `{Run(void*, bool, SteamAPICall_t), Run(void*),
+  GetCallbackSizeBytes}` (overloads reversed); a `CCallback<T,P>` is vptr,
+  flags +4, `m_iCallback` +8, object +0xC, member function +0x10.
+- Generated vtables (x86recomp `tools/steam_vtables.py`, MSVC order) agree
+  with the game's `steam_api.dll` flat exports for all 118 checked slots.
+- Callback structs: macOS libsteam_api packs them to 4, the Windows guest
+  to 8; translation still to write. The engine registers 12 callback types
+  and 26 call-result uses (Workshop/UGC, RemoteStorage, HTTP, leaderboards,
+  stats, overlay, DLC installed), so more interfaces than the six
+  (ISteamUGC, ISteamRemoteStorage, ISteamHTTP) will be needed.
+- Trace: `SteamAPI_RestartAppIfNecessary` -> 0, `SteamAPI_Init` -> 1
+  (client loaded, ownership confirmed), `SteamAPI_RegisterCallback`, then
+  the engine continues to `_time64` (HLE64_ONLY: next CRT item).

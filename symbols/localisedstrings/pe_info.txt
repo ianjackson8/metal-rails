@@ -1,0 +1,33 @@
+image_base 0x10000000  image_size 0x18000  entry 0x100061dc  timestamp 0x68f73e3d
+relocations: yes
+sections:
+  .text    va 0x10001000 vsize    0x5997 raw    0x5a00 chars 0x60000020
+  .rdata   va 0x10007000 vsize    0x1452 raw    0x1600 chars 0x40000040
+  .data    va 0x10009000 vsize    0xc4f8 raw     0x200 chars 0xc0000040
+  .rsrc    va 0x10016000 vsize     0x520 raw     0x600 chars 0x40000040
+  .reloc   va 0x10017000 vsize     0x3b8 raw     0x400 chars 0x42000040
+imports per dll:
+  zlibwapi.dll   8
+  KERNEL32.dll   20
+  MSVCP140.dll   2
+  VCRUNTIME140.dll 11
+  api-ms-win-crt-string-l1-1-0.dll 6
+  api-ms-win-crt-runtime-l1-1-0.dll 11
+  api-ms-win-crt-stdio-l1-1-0.dll 7
+  api-ms-win-crt-heap-l1-1-0.dll 3
+exports: 14 func=14
+rich header (prodid build count):
+  147 30729 8
+  257 33030 4
+  253 33030 1
+  261 33030 17
+  260 33030 10
+  259 33030 2
+  257 29395 2
+  156 30319 3
+    1     0 74
+  261 33145 4
+  256 33145 1
+  255 33145 1
+  151     0 1
+  258 33145 1

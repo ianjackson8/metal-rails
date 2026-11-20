@@ -1,0 +1,15 @@
+va	kind	mangled	demangled
+10004BE6	func	SetLanguage	
+10004D50	func	GetLanguage	
+10004D5A	func	LoadRouteLanguageFile	
+10004F46	func	LoadScenarioLanguageFile	
+1000513C	func	LoadBPSetLanguageFile	
+100053BD	func	RouteLanguageFileLoaded	
+10005419	func	ScenarioLanguageFileLoaded	
+10005475	func	GetStringById	
+100054AE	func	GetStringByStr	
+1000563E	func	GetStringByStrEmpty	
+10005665	func	GetIntegerID	
+10005686	func	GetLanguageFilePostfix	
+10005690	func	GetLanguageFilePostfixFallback	
+100056B1	func	GetLanguageFilePostfixDefault	

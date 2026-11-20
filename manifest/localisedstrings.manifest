@@ -1,0 +1,4 @@
+# LocalisedStrings.dll (v79.0a, SHA-256 750cab94...b1d2): this port's
+# changes to the lifted string-table DLL. Lifted at base 0x12000000 (it
+# shares the engine's preferred base); VAs here are at its preferred base
+# 0x10000000, as in its symbols. Same grammar as railworks.manifest.

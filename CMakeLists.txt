@@ -21,7 +21,32 @@ if(NOT EXISTS "${X86RECOMP_DIR}/CMakeLists.txt")
 endif()
 add_subdirectory("${X86RECOMP_DIR}" x86recomp)
 
-# Milestones 1-2 (feasibility): only the lifter is built
-# (cmake --build --preset release --target recomp_lift); tools/lift.sh
-# then writes generated/ from the player's own install. The game target
-# (recomp_add_lifted + runtime) comes with milestone 3.
+# The game: runtime + HLE + lifted code (generated/, written by
+# tools/lift.sh from the player's own install: RailWorks.exe and
+# plugins/GameManagerVC.dll in one multi-module lift). Absent until the
+# first lift, so a fresh checkout still builds the lifter.
+recomp_add_lifted(railworks_lifted "${CMAKE_CURRENT_SOURCE_DIR}/generated")
+if(TARGET railworks_lifted)
+  add_executable(railworks src/main.cpp $<TARGET_OBJECTS:railworks_lifted>)
+  target_link_libraries(railworks PRIVATE recomp_runtime recomp_d3d9
+                        recomp_xinput recomp_dinput8)
+  # recomp_ucrt (UCRT, VCRUNTIME140, MSVCP140) was written for x64 guests.
+  # Linked only with an x86recomp that marks those handlers HLE64_ONLY, so
+  # a 32-bit call into one not yet audited for 32-bit guests is a fatal
+  # error naming it rather than a silent 8-byte pointer access.
+  # steam_api.dll to the native Steam client: built by x86recomp when
+  # RECOMP_STEAMWORKS_SDK names an SDK with the game's interface versions
+  # (1.53a; tools/local.env STEAMWORKS_SDK).
+  if(TARGET recomp_steam)
+    target_link_libraries(railworks PRIVATE recomp_steam)
+  else()
+    message(STATUS "railworks: no recomp_steam (set RECOMP_STEAMWORKS_SDK); Steam calls will be fatal")
+  endif()
+  file(READ "${X86RECOMP_DIR}/src/runtime/hle/hle.h" _hle_h)
+  if(_hle_h MATCHES "HLE64_ONLY")
+    target_link_libraries(railworks PRIVATE recomp_ucrt)
+  else()
+    message(STATUS "railworks: x86recomp has no HLE64_ONLY; recomp_ucrt not linked")
+  endif()
+  set_target_properties(railworks PROPERTIES ENABLE_EXPORTS ON)  # names in fault backtraces
+endif()

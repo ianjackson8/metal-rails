@@ -1,5 +1,6 @@
 #!/bin/bash
-# ghidra_export.sh: auto-analyse RailWorks.exe and plugins/GameManagerVC.dll
+# ghidra_export.sh: auto-analyse RailWorks.exe, plugins/GameManagerVC.dll,
+# LocalisedStrings.dll and zlibwapi.dll
 # with Ghidra headless (once; the project lives in ghidra/, gitignored) and
 # export what the lifter needs into symbols/<module>/:
 #   functions.tsv, jumptables.tsv   (Ghidra, x86recomp's tools/ghidra scripts)
@@ -54,4 +55,6 @@ run() {
 }
 run railworks RailWorks.exe
 run gamemanager plugins/GameManagerVC.dll
+run localisedstrings LocalisedStrings.dll
+run zlibwapi zlibwapi.dll
 echo "== done $(date +%T)"
