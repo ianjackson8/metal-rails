@@ -61,6 +61,14 @@ int main(int argc, char** argv) {
   game.id = "railworks";
   // Where a Steam install puts the game on Windows; the guest sees this path.
   game.guest_dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RailWorks";
+  // The Steam library's Workshop content (steamapps/workshop, next to
+  // steamapps/common), where Steam puts subscribed items: read only.
+  {
+    const size_t common = game_dir.rfind("/common/");
+    if (common != std::string::npos)
+      game.mounts.push_back({"C:\\Program Files (x86)\\Steam\\steamapps\\workshop",
+                             game_dir.substr(0, common) + "/workshop"});
+  }
   game.exe_name = "RailWorks.exe";
   // The engine DLL the stub LoadLibrary's, the string table DLL the engine
   // LoadLibrary's and minizip (zlibwapi), which both import: lifted together
