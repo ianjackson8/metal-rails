@@ -763,12 +763,31 @@ What loading needed beyond the menu:
   controller).
 
 Open:
-- **Plain track sometimes missing on the first load** (points/switches
-  drawn, straight and curved track not); loading the same scenario again
-  drew it all. Not the lifter: re-lifting changed only 8 switch sites.
-  Suspects: the game builds track meshes on worker threads (a race in
-  the D3D9 buffer path), or the shared buffer heap filling (256 MB, full
-  on every load so far).
+- **Plain track sometimes missing after a fresh boot** (points drawn,
+  plain track not; scenario Restart keeps it so, loading again from the
+  main menu draws it). A race in the engine's loading, timing-dependent:
+  - every route file is read by one loader thread (`0104`, opens from
+    `10EFA157`) in the same order in good and bad boots, and the data is
+    identical; what differs is that the main thread (`0100`, through
+    D3DX) never creates the `LoftTexDiffSpec.fx.o` effect in a bad boot
+    (it does `LoftTexDiff`, `LoftTexDiffTrans`, `LoftBumpTrans`);
+  - so the main thread sets up loft materials for the track objects it
+    finds while the loader thread builds them, and in a bad boot misses
+    the specular one (probably an object seen half built);
+  - not memory ordering (it happens with `RAILWORKS_SERIAL=1`), not the
+    buffer heap (`RAILWORKS_GPU_HEAP_MB=1024`), not the lifter (a bisect
+    seemed to point at one PhysX switch, but the same build then drew
+    track: the odds move with timing; bad in 5 of 6 boots with every
+    switch recovered, 0 of 6 with fewer, one later boot of each kind).
+  Next: find what orders the material set-up after the loader on Windows.
+- **PhysX froze** after several minutes of driving: its simulation thread
+  (`0108`) loops forever in `f_12737880` (`10037880` in PhysXCore.dll), a
+  walk of a pair list of 12-byte nodes with 16-bit next links, which has
+  become a cycle; the main thread waits for the step. PhysX's spin lock
+  (`1001B6D0`) acquires and releases through Interlocked calls, so that
+  lock is not the culprit. One long drive with `RAILWORKS_SERIAL=1` did
+  not freeze (not conclusive). Candidate: `RECOMP_TSO` (x86 ordering for
+  plain loads and stores in lifted code).
 - A "junction switched against train" derailment while track was missing;
   judge only with track drawn.
 - `d3dcompiler_43.dll` is asked for 10 times (not provided).
