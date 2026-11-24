@@ -35,7 +35,7 @@ an M5 Pro). A native renderer is where that has to be beaten.
 Milestone 1   Analyse the game's code (Ghidra)          ██████████  done
 Milestone 2   Translate it to C++, go/no-go              ██████████  done (GO)
 Milestone 3   Startup: CRT, Steam, window, D3D9 device   ██████████  done
-Milestone 4   Main menu on screen                        ██████░░░░  in progress
+Milestone 4   Main menu on screen                        ██████████  done
 Milestone 5   Load a route                               ░░░░░░░░░░
 Milestone 6   Drive a train (input, PhysX, cab, HUD)     ░░░░░░░░░░
 Milestone 7   Correct rendering, DLC                     ░░░░░░░░░░
@@ -55,9 +55,10 @@ What works today, in startup order:
 | ✅ | Textures and geometry |
 | ✅ | **Text**: Windows GDI fonts rendered with macOS CoreText |
 | ✅ | **Steam Cloud**, stats and leaderboards via the Steam client |
-| ⏳ | Lua scripting's error handling (`setjmp`/`longjmp`) |
-| ⬜ | Audio (OpenAL) |
-| ⬜ | Scaleform UI → **main menu** |
+| ✅ | Lua scripting, C++ library (Microsoft's `msvcp140`), PhysX, SilverLining |
+| ✅ | Audio (OpenAL on x86recomp's mixer) |
+| ✅ | **Scaleform main menu**, text in the game's fonts, mouse |
+| ⬜ | Loading a route (milestone 5) |
 
 The startup trace reaches about a million imported calls before it stops
 at the next unimplemented function. Details, addresses and measurements:

@@ -158,9 +158,12 @@ modules to add, D3DX effect framework surface, a still-patched target,
 3. **Done (2026-11-20).** Startup trace through the 32-bit
    UCRT/VCRUNTIME, Steam bridge, fibers, to D3D9 device creation on
    x86recomp's Metal renderer.
-4. **In progress.** Main menu (Scaleform) on screen, before any 3D:
-   Microsoft's `d3dx9_43` lifted from the player's DirectX redistributable
-   (effects, fonts via GDI on CoreText), audio (OpenAL), Scaleform UI.
+4. **Done (2026-11-24).** Main menu (Scaleform) on screen and usable:
+   Microsoft's `d3dx9_43` and `msvcp140` lifted from the player's
+   redistributables, PhysX and SilverLining lifted, GDI text on CoreText,
+   OpenAL on x86recomp's mixer, 4 GiB address space (LAA). Deferred:
+   unvisited menu screens' imports (as they block), menu lag (8), the
+   top-down stress failure (5), gamma ramps and the game's cursor (7).
 5. Load a route: a scenario's terrain, track, rolling stock, sky
    (SilverLining), Lua scripts.
 6. Drive a train: input (keyboard, mouse, controllers; RailDriver and
