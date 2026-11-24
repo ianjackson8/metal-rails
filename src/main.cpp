@@ -16,6 +16,7 @@
 #include <string>
 
 #include "runtime/log.h"
+#include "runtime/platform.h"
 #include "runtime/runtime.h"
 
 int main(int argc, char** argv) {
@@ -67,6 +68,20 @@ int main(int argc, char** argv) {
   game.lifted_dlls.push_back({"plugins\\GameManagerVC.dll", 0});
   game.lifted_dlls.push_back({"LocalisedStrings.dll", 0x12000000});
   game.lifted_dlls.push_back({"zlibwapi.dll", 0x12100000});
+  // Microsoft's D3DX (June 2010, x86), which the engine imports: from the
+  // player's Steam DirectX redistributable, put in the data folder by
+  // tools/redist.sh (never shipped), lifted at 0x12200000.
+  std::string data_dir;
+  if (const char* x = std::getenv("XDG_DATA_HOME"); x && *x) data_dir = std::string(x) + "/railworks";
+  else data_dir = std::string(std::getenv("HOME") ? std::getenv("HOME") : "") +
+                  recomp::platform::kUserDataDir + "railworks";
+  const std::string d3dx = data_dir + "/redist/d3dx9_43.dll";
+  if (stat(d3dx.c_str(), &st) != 0) {
+    std::fprintf(stderr, "railworks: no %s: run tools/redist.sh (it takes d3dx9_43.dll from "
+                 "Steam's DirectX redistributable)\n", d3dx.c_str());
+    return 2;
+  }
+  game.lifted_dlls.push_back({"d3dx9_43.dll", 0x12200000, d3dx});
   // Steam app 24010: the steam_api bridge (recomp_steam) asks the running
   // Steam client about this app (ownership, DLC, the user).
   game.steam_app_id = 24010;

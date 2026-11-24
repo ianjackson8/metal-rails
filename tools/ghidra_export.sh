@@ -24,11 +24,12 @@ export PATH="$LLVM/bin:$PATH"   # llvm-undname, llvm-objdump
 mkdir -p "$P" "$L"
 . "$here/tools/hashes.sh"
 
-# module dir, file in the game folder, program name in the project
+# module dir, file in the game folder (or an absolute path, already
+# verified: the redistributable's d3dx9_43.dll), program name in the project
 run() {
-  local mod=$1 rel=$2 file="$RAILWORKS_GAME_DIR/$2" prog
+  local mod=$1 rel=$2 file prog
   prog=$(basename "$rel")
-  check_hash "$rel"
+  if [ "${rel:0:1}" = / ]; then file=$rel; else file="$RAILWORKS_GAME_DIR/$rel"; check_hash "$rel"; fi
   mkdir -p "$here/symbols/$mod"
   echo "== $mod: PE facts and exports $(date +%T)"
   python3 -I "$here/vendor/x86recomp/tools/pe_symbols.py" "$file" --out "$here/symbols/$mod"
@@ -53,4 +54,6 @@ run railworks RailWorks.exe
 run gamemanager plugins/GameManagerVC.dll
 run localisedstrings LocalisedStrings.dll
 run zlibwapi zlibwapi.dll
+"$here/tools/redist.sh"
+run d3dx9_43 "$("$here/tools/redist.sh" --path)"
 echo "== done $(date +%T)"

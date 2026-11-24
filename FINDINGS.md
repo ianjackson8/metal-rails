@@ -573,3 +573,57 @@ DirectX/Jun2010/Jun2010_d3dx9_43_x86.cab`, with D3DCompiler_43). Its
 imports: msvcrt.dll 85 (x86recomp has no msvcrt HLE), KERNEL32 76 (7
 missing), GDI32 27 (16 missing: glyph outlines, DIB sections, text),
 ADVAPI32 3 (1 missing). Decision needed: lift it, or reimplement D3DX.
+
+## Milestone 4: Microsoft's D3DX lifted (2026-11-24)
+
+Decision (user): lift Microsoft's `d3dx9_43.dll` from the player's own
+Steam DirectX redistributable, not reimplement D3DX.
+
+- `tools/redist.sh` extracts it (SHA-256 `0b28546b...`, pinned) from
+  `Steamworks Shared/_CommonRedist/DirectX/Jun2010/Jun2010_d3dx9_43_x86.cab`
+  to `<data>/redist/d3dx9_43.dll` (`~/Library/Application Support/
+  railworks/redist` on macOS). Never in the repo. `src/main.cpp` lifts it
+  at `0x12200000` (after LocalisedStrings and zlibwapi) from there
+  (`LiftedDll::host_path`, x86recomp); the game exits with a message if it
+  is missing. Ghidra: 4,606 functions; the lift finds 5,914.
+- Its data sits in `.text` (no `.rdata`): ~3,000 junk decodes of data
+  bytes, all outside Ghidra's function bodies. Harmless (never reached);
+  a lifter option to skip data-pointer entries in such images is a
+  follow-up.
+- Build cost. One D3DX function (`1228148D`, ~97k instructions, its HLSL
+  compiler; 512k lines of C++) cannot be one host function: optimised it
+  ran > 1 h; at -O0 arm64 GlobalISel's CSE and then branch relaxation
+  never finished, and the result was > 1 MiB, so branches were out of
+  range ("fixup value out of range"). x86recomp `--split-above` (new)
+  emits it as 7 parts in files `gen_d3dx9_43_075_<n>.cpp`; `tools/lift.sh`
+  passes `--split-above 12000` (only this function; the engine has
+  none that big). The rest of the slow build is straight-line x87 code:
+  runs of ~10k x87 instructions (`D3DXSHMultiply6` at `1223E081`, parts
+  of `1228148D`) are one block each, and SLP vectorisation, CSE, SROA
+  and the like are super-linear in a block's size: ~1.5 h for 2 files on
+  the first build (cached after). Follow-up upstream: cap x87 run length
+  in the lifter.
+- CPU dispatch: D3DX jumps through a table of function pointers in
+  `.data` (`123CA068..123CA18C`, 74 slots, 124 `jmp [slot]` sites) that
+  the first call repoints to the SSE/x87 implementation. Ghidra exports
+  each as a one-entry jump table (the slot's initial value); x86recomp
+  now ignores such "tables" for writable slots, so they dispatch.
+- Imports added upstream: `msvcrt.dll` (aliases to the UCRT handlers
+  plus msvcrt's own: operator new/delete, `_onexit`/`__dllonexit`,
+  `_lock`, `_controlfp`, `_clearfp`, the `_CI*` x87 intrinsics, legacy
+  `_snprintf` family, ...), `RegOpenKeyA`, shader `GetDevice`,
+  `ValidateDevice`, recorded state blocks (`BeginStateBlock`, used by
+  ID3DXEffect), and the engine's own `_libm_sse2_*_precise` maths
+  (arguments and result in xmm0).
+
+Trace (612k lines): D3DX initialises, effects compile and record their
+state blocks, the engine builds geometry, then **`cFontRenderer`**
+(engine, vtable `10FED838`) creates an `ID3DXFont`: D3DX's font code
+needs real GDI text (`GetCharABCWidthsI` via GetProcAddress, then
+`CreateFontIndirectW`, `GetTextMetricsW`, `CreateDIBSection`,
+`ExtTextOutW`, `GetGlyphOutlineW`, ...). x86recomp's GDI text functions
+are stand-ins that draw nothing, so `D3DXCreateFont` fails; the engine
+does not check the result and calls `PreloadCharacters('!', '~')` through
+a stale local (the `cFontRenderer` itself): "indirect branch to CC0000C2
+from 107CA269". Decision needed: how GDI renders text (font engine and
+font source).

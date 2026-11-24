@@ -1,0 +1,5 @@
+# d3dx9_43.dll (Microsoft, June 2010 DirectX redistributable, x86; SHA-256
+# 0b28546b...4f5f, from the player's Steam install by tools/redist.sh):
+# this port's changes. Lifted at base 0x12200000 (it shares the engine's
+# preferred base); VAs here are at 0x10000000. Same grammar as
+# railworks.manifest.
