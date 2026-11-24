@@ -1,0 +1,35 @@
+image_base 0x10000000  image_size 0x10000  entry 0x1000835f  timestamp 0x65b12a99
+relocations: yes
+tls: raw 0x1000ac10-0x1000ac18 index_va 0x1000d21c callbacks_va 0x1000a1bc
+sections:
+  .text    va 0x10001000 vsize    0x834a raw    0x8400 chars 0x60000020
+  .rdata   va 0x1000a000 vsize    0x2ae2 raw    0x2c00 chars 0x40000040
+  .data    va 0x1000d000 vsize     0x56c raw     0x200 chars 0xc0000040
+  .rsrc    va 0x1000e000 vsize     0x1e0 raw     0x200 chars 0x40000040
+  .reloc   va 0x1000f000 vsize     0x97c raw     0xa00 chars 0x42000040
+imports per dll:
+  d3dx9_43.dll   11
+  KERNEL32.dll   21
+  USER32.dll     3
+  GDI32.dll      1
+  MSVCP140.dll   16
+  VCRUNTIME140.dll 12
+  api-ms-win-crt-runtime-l1-1-0.dll 13
+  api-ms-win-crt-string-l1-1-0.dll 2
+  api-ms-win-crt-stdio-l1-1-0.dll 2
+  api-ms-win-crt-math-l1-1-0.dll 5
+  api-ms-win-crt-heap-l1-1-0.dll 3
+exports: 137 func=137
+rich header (prodid build count):
+  147 30729 10
+  261 32533 20
+  260 32533 10
+  259 32533 3
+  257 32533 4
+  257 30795 6
+  156 21202 3
+    1     0 89
+  261 32825 5
+  256 32825 1
+  255 32825 1
+  258 32825 1

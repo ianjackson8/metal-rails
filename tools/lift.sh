@@ -9,7 +9,8 @@
 # Microsoft's d3dx9_43.dll and msvcp140.dll (tools/redist.sh) are lifted
 # with them, at 0x12200000 and 0x12400000; PhysX 2.x (PhysXLoader,
 # PhysXCooking, PhysXCore, shipped with the game) at 0x12500000, 0x12600000
-# and 0x12700000.
+# and 0x12700000; SilverLining's DX9 renderer DLL (the sky, shipped in
+# data/SilverLining) at 0x12B00000.
 # Build the lifter first: cmake --preset release && cmake --build --preset release
 #   RAILWORKS_GAME_DIR: the game folder, from the environment or tools/local.env.
 # --split-above: d3dx9_43 has a function of ~97k instructions, over 1 MiB
@@ -28,16 +29,17 @@ check_hash zlibwapi.dll
 check_hash PhysXLoader.dll
 check_hash PhysXCooking.dll
 check_hash PhysXCore.dll
+check_hash data/SilverLining/vc143/win32/SilverLiningDirectX9-MT-DLL.dll
 "$here/tools/redist.sh"
 d3dx="$("$here/tools/redist.sh" --path d3dx9_43)"
 msvcp="$("$here/tools/redist.sh" --path msvcp140)"
 lift="${LIFTER:-$here/out/build/release/x86recomp/tools/lifter/recomp_lift}"
 [ -x "$lift" ] || { echo "build first (cmake --preset release && cmake --build --preset release): no $lift"; exit 1; }
-for m in railworks gamemanager localisedstrings zlibwapi physxloader physxcooking physxcore d3dx9_43 msvcp140; do
+for m in railworks gamemanager localisedstrings zlibwapi physxloader physxcooking physxcore silverlining d3dx9_43 msvcp140; do
   [ -f "$here/symbols/$m/functions.tsv" ] || { echo "no symbols/$m/functions.tsv: run tools/ghidra_export.sh"; exit 1; }
 done
 mkdir -p "$here/logs"
-echo "lift.sh: lifting RailWorks.exe, GameManagerVC.dll, LocalisedStrings.dll, zlibwapi.dll, PhysX (Loader, Cooking, Core), d3dx9_43.dll, msvcp140.dll"
+echo "lift.sh: lifting RailWorks.exe, GameManagerVC.dll, LocalisedStrings.dll, zlibwapi.dll, PhysX (Loader, Cooking, Core), SilverLining DX9, d3dx9_43.dll, msvcp140.dll"
 start=$(date +%s)
 set +e
 (cd "$RAILWORKS_GAME_DIR" && "$lift" \
@@ -59,6 +61,8 @@ set +e
     --manifest "$here/manifest/physxcooking.manifest" --base 12600000 \
   --module PhysXCore.dll --symbols "$here/symbols/physxcore" \
     --manifest "$here/manifest/physxcore.manifest" --base 12700000 \
+  --module data/SilverLining/vc143/win32/SilverLiningDirectX9-MT-DLL.dll --symbols "$here/symbols/silverlining" \
+    --manifest "$here/manifest/silverlining.manifest" --base 12B00000 \
   --split-above 12000 \
   --out "$here/generated" "$@") 2>&1 | tee "$here/logs/lift.log"
 rc=${PIPESTATUS[0]}

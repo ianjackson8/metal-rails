@@ -12,6 +12,7 @@ check_hash() {
     PhysXLoader.dll)           want=db9ea1334a6364c4d02c2e3fe826ab48fb6b07242fff00bd41feb17524fde4de ;;
     PhysXCore.dll)             want=c1758f8deada5dad54eb384b4f94a43f69b54c6f671cdcabef4f64d9c6f1da3a ;;
     PhysXCooking.dll)          want=c6a1a1f4127bef756e8628775de18c57f93bb7cce22403efb3b519ea1f26a28d ;;
+    data/SilverLining/vc143/win32/SilverLiningDirectX9-MT-DLL.dll) want=3ae59cfa2d37f511e210fb6e44b391375a01666d063033820c911d9a4758be1b ;;
     *) echo "check_hash: no pinned hash for $1"; exit 1 ;;
   esac
   local have

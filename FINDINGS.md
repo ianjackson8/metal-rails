@@ -678,3 +678,26 @@ functions, 7.25M instructions.
 After PhysX: Steam HTTP (`ISteamHTTP` v003, a request at startup), then
 **OpenAL** (`alGetError` first). Decision (user): OpenAL 1.1 on
 x86recomp's own mixer (in progress). Trace: 1.14M lines.
+
+### Into the main loop (2026-11-24)
+
+- **OpenAL** works on x86recomp's mixer (`recomp_openal`): the engine
+  opens the device, probes the source limit (generates until
+  AL_OUT_OF_MEMORY at 256, deletes them), then plays.
+- The engine registers its UI fonts privately (`AddFontResourceExA`,
+  FR_PRIVATE) from `data/font` (Exo, Aura, Bree Serif, FZSSJW): CoreText
+  process-scope registration.
+- After Steam friends/HTTP/DLC queries the engine reaches its message
+  loop (`PeekMessageA`) and D3DX's sprite/font setup.
+- **Correction to CLAUDE.md ("none are shipped"): SilverLining's DLLs are
+  shipped**, in `data/SilverLining/{vc14,vc143}/{win32,x64}/`. The 32-bit
+  engine loads `data\SilverLining\/VC143/win32/SilverLiningDirectX9-MT-DLL.dll`
+  (49 KB, 137 exports: the D3D9 renderer; the sky model is in the
+  engine). Without it the engine tore everything down and exited 0 after
+  ~30 s with no frame. Now lifted at `0x12B00000` (hash pinned; empty TLS
+  callback list). It needs `SetPrivateData` and **volume textures**
+  (`CreateVolumeTexture`), which x86recomp's renderer does not have yet:
+  next.
+- Running without `RAILWORKS_TRACE` takes ~30 s to that point; traced, the
+  import log is ~4 GB (113M calls), and the hang watchdog reports the
+  tracing itself (the main thread busy printing).

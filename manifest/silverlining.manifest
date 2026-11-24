@@ -1,0 +1,5 @@
+# data/SilverLining/vc143/win32/SilverLiningDirectX9-MT-DLL.dll
+# (SilverLining's D3D9 renderer, shipped with the game; v79.0a hash in
+# tools/hashes.sh): this port's changes. Lifted at base 0x12B00000 (it
+# shares the engine's preferred base); VAs here are at 0x10000000. Same
+# grammar as railworks.manifest.

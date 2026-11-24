@@ -40,6 +40,12 @@ if(TARGET railworks_lifted)
   add_executable(railworks src/main.cpp $<TARGET_OBJECTS:railworks_lifted>)
   target_link_libraries(railworks PRIVATE recomp_runtime recomp_d3d9
                         recomp_xinput recomp_dinput8)
+  # OpenAL on x86recomp's mixer (needs its audio library, built with FFmpeg).
+  if(TARGET recomp_openal)
+    target_link_libraries(railworks PRIVATE recomp_openal)
+  else()
+    message(WARNING "no recomp_openal (x86recomp's audio needs FFmpeg): the game will stop at its first OpenAL call")
+  endif()
   # recomp_ucrt (UCRT, VCRUNTIME140, MSVCP140) was written for x64 guests.
   # Linked only with an x86recomp that marks those handlers HLE64_ONLY, so
   # a 32-bit call into one not yet audited for 32-bit guests is a fatal

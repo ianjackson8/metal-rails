@@ -75,6 +75,10 @@ int main(int argc, char** argv) {
   game.lifted_dlls.push_back({"PhysXLoader.dll", 0x12500000});
   game.lifted_dlls.push_back({"PhysXCooking.dll", 0x12600000});
   game.lifted_dlls.push_back({"PhysXCore.dll", 0x12700000});
+  // SilverLining (the sky): the engine loads its D3D9 renderer DLL from
+  // the game's data folder.
+  game.lifted_dlls.push_back(
+      {"data\\SilverLining\\vc143\\win32\\SilverLiningDirectX9-MT-DLL.dll", 0x12B00000});
   // Microsoft DLLs the engine imports, put in the data folder by
   // tools/redist.sh (never shipped): D3DX (June 2010, x86, from the
   // player's Steam DirectX redistributable) at 0x12200000 and the C++
