@@ -108,6 +108,10 @@ int main(int argc, char** argv) {
   // Steam app 24010: the steam_api bridge (recomp_steam) asks the running
   // Steam client about this app (ownership, DLC, the user).
   game.steam_app_id = 24010;
+  // RailWorks.exe is large-address-aware (IMAGE_FILE_LARGE_ADDRESS_AWARE):
+  // on 64-bit Windows it has ~4 GiB, and loading the menus' content needs
+  // more than 2.
+  game.large_address = true;
   game.total_phys_mb = 4096;
   game.video_memory_mb = 2048;
   return recomp::RunProcess(game, exe, game_dir, game_args);

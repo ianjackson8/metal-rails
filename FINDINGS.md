@@ -701,3 +701,41 @@ x86recomp's own mixer (in progress). Trace: 1.14M lines.
 - Running without `RAILWORKS_TRACE` takes ~30 s to that point; traced, the
   import log is ~4 GB (113M calls), and the hang watchdog reports the
   tracing itself (the main thread busy printing).
+
+## Milestone 4 reached: the Scaleform main menu (2026-11-24)
+
+The launch screen (Academy / Main Menu tiles) and the main menu with the
+Dovetail Live login draw natively on Metal, text in the game's own
+faces, pointer and clicks working. What it took after the main loop:
+
+- **Anti-tamper check on steam_api.dll** (main loop setup, `104D32D7`):
+  `GetModuleHandleA("steam_api")` (the name XOR-hidden, key `0x1265ABF6`),
+  `GetModuleFileNameA`, a hash of that file against a digest hidden in
+  the engine (`0x111752C8`, XOR `0x72686B28`), and
+  `ISteamApps::BIsSubscribedApp(24010)` from the client. Success leaves
+  the loop counter at 16; failure makes it count down from 15 and the
+  game quits after its first frames (no message). x86recomp returned 0 for
+  bridged DLLs' module handles; with the user's approval it now answers
+  as Windows (a handle for every imported DLL; the file name is the
+  game folder's genuine `steam_api.dll`). Ownership still comes from the
+  Steam client; no game code is patched.
+- Scaleform's font provider uses GDI: `AddFontResourceExA(FR_PRIVATE)` on
+  `data/font`, `EnumFontFamiliesExW`, `CreateFontW`, `GetKerningPairsW`,
+  `GetGlyphOutline(GGO_NATIVE)` (which must be quadratics: the faces are
+  CFF), and draws its own glyphs.
+- Startup also reads Workshop subscriptions (`ISteamUGC`), mapped through
+  a read-only mount of the library's `steamapps/workshop`.
+- **RailWorks.exe is large-address-aware**; `game.large_address` gives it
+  ~4 GiB as on 64-bit Windows. The x86recomp stress mode
+  (`RAILWORKS_TOP_DOWN=1`) currently fails early: `ERROR: Could not create
+  effect vertexcolour.fx` (cHcEffectDx.cpp:177), so something in the
+  effect path mishandles addresses above 2 GiB. To find before long
+  sessions reach high memory.
+- A run that died while saving left `<data>/drive_c/.../Dovetail Games/
+  TS1/DovetailLive.sav` empty; the next start parses it into a garbage
+  length and dies in `operator new` (`std::bad_alloc`, uncaught: 32-bit
+  C++ exceptions are not modelled yet). Moved aside, a good save is 32
+  bytes.
+- Pointer: the game reads WM_MOUSEMOVE. x86recomp used its virtual
+  cursor for every fullscreen-exclusive window, which drifted from the
+  visible pointer; now only while the cursor is hidden or clipped.
