@@ -1,0 +1,11 @@
+va	kind	mangled	demangled
+10009CA0	func	NxGetUtilLib	
+10009CE0	func	NxGetPhysicsSDK	
+10009D10	func	NxGetFoundationSDK	
+10009D40	func	NxGetPhysicsSDKAllocator	
+10009D70	func	NxReleasePhysicsSDK	
+1000A3B0	func	NxCreateModule	
+1000A4F0	func	NxCreatePhysicsSDK	
+1000A530	func	NxGetCookingLib	
+1000A590	func	NxCreatePhysicsSDKWithID	
+1000A5D0	func	NxGetCookingLibWithID	

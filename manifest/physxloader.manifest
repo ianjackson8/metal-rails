@@ -1,0 +1,4 @@
+# PhysXLoader.dll (PhysX 2.x, shipped with the game; v79.0a hash in tools/hashes.sh):
+# this port's changes. Lifted at base 0x12500000 (it shares the engine's
+# preferred base); VAs here are at 0x10000000. Same grammar as
+# railworks.manifest.

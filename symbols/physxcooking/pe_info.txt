@@ -1,0 +1,22 @@
+image_base 0x10000000  image_size 0x64000  entry 0x10006e17  timestamp 0x4e13dbc3
+relocations: yes
+sections:
+  .text    va 0x10001000 vsize   0x4ccfa raw   0x4ce00 chars 0x60000020
+  .rdata   va 0x1004e000 vsize    0x989b raw    0x9a00 chars 0x40000040
+  .data    va 0x10058000 vsize    0x6808 raw    0x1a00 chars 0xc0000040
+  .rsrc    va 0x1005f000 vsize     0x570 raw     0x600 chars 0x40000040
+  .reloc   va 0x10060000 vsize    0x39cc raw    0x3a00 chars 0x42000040
+imports per dll:
+  KERNEL32.dll   77
+  WSOCK32.dll    12
+exports: 14 func=14
+rich header (prodid build count):
+  132 30729 43
+  149 30729 30
+  131 30729 143
+  123 50727 5
+    1     0 113
+  138 30729 82
+  146 30729 1
+  148 21022 1
+  145 30729 1

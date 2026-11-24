@@ -1,0 +1,24 @@
+image_base 0x10000000  image_size 0x13000  entry 0x10001400  timestamp 0x4e13dbb9
+relocations: yes
+sections:
+  .text    va 0x10001000 vsize    0x9622 raw    0x9800 chars 0x60000020
+  .rdata   va 0x1000b000 vsize    0x222a raw    0x2400 chars 0x40000040
+  .data    va 0x1000e000 vsize    0x2adc raw    0x1000 chars 0xc0000040
+  .rsrc    va 0x10011000 vsize     0x564 raw     0x600 chars 0x40000040
+  .reloc   va 0x10012000 vsize     0xf52 raw    0x1000 chars 0x42000040
+imports per dll:
+  IPHLPAPI.DLL   1
+  KERNEL32.dll   69
+  ADVAPI32.dll   3
+exports: 10 func=10
+rich header (prodid build count):
+  150 20413 1
+  132 30729 30
+  149 30729 17
+  131 30729 97
+  123 50727 7
+    1     0 89
+  138 30729 2
+  146 30729 1
+  148 21022 1
+  145 30729 1

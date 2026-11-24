@@ -9,6 +9,9 @@ check_hash() {
     plugins/GameManagerVC64.dll) want=6dcc422143de7ebb3a5a2d2913bb2b8742858a05978ce5cfc3bfb827d1ae56ba ;;
     LocalisedStrings.dll)      want=750cab94d96ec322087dd1e2e4fab7ec7cb843951d0744c5a3f6de00c2b7b1d2 ;;
     zlibwapi.dll)              want=9f8729ac49e0ccea86fe3b1a9b2c3fae9986ecd09db92853e7a588dbda85bf90 ;;
+    PhysXLoader.dll)           want=db9ea1334a6364c4d02c2e3fe826ab48fb6b07242fff00bd41feb17524fde4de ;;
+    PhysXCore.dll)             want=c1758f8deada5dad54eb384b4f94a43f69b54c6f671cdcabef4f64d9c6f1da3a ;;
+    PhysXCooking.dll)          want=c6a1a1f4127bef756e8628775de18c57f93bb7cce22403efb3b519ea1f26a28d ;;
     *) echo "check_hash: no pinned hash for $1"; exit 1 ;;
   esac
   local have

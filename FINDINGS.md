@@ -627,3 +627,54 @@ does not check the result and calls `PreloadCharacters('!', '~')` through
 a stale local (the `cFontRenderer` itself): "indirect branch to CC0000C2
 from 107CA269". Decision needed: how GDI renders text (font engine and
 font source).
+
+Decision (user, 2026-11-24): GDI text on CoreText. x86recomp now has a
+host font engine (`runtime/host_font.h`, CoreText on Apple) and real GDI
+fonts, DCs and DIB sections. D3DX's font path, as traced: optional GDI
+entry points by GetProcAddress (`GetCharABCWidthsI`, `GetCharWidthI`,
+`GetFontUnicodeRanges`), Uniscribe (`usp10.dll`) tried and skipped when
+absent, then `CreateFontIndirectW`, `CreateDIBSection`,
+`GetCharacterPlacementW` for glyph indices, and one `ExtTextOutW`
+(ETO_GLYPH_INDEX) into the DIB per glyph (188 at startup). The engine's
+fonts come up from the host's faces of the same names.
+
+After the fonts (trace 636k-995k lines):
+- Steam Cloud: `ISteamRemoteStorage` v016 (`FilePersisted`, ...) and
+  leaderboards (`FindLeaderboard`), forwarded to the Steam client.
+- Lua's protected calls (`luaD_rawrunprotected`, e.g. at `10E2DDDC`) call
+  `_setjmp3` from VCRUNTIME140 through an import thunk (`10E2B551`);
+  D3DX imports msvcrt's. The lifter now treats imported setjmps as
+  setjmp calls (26 new resume entries), and `longjmp` resumes there.
+- Lua's first script (`dev/scripts/engineScript.lua`) loads through
+  `fopen`/`getc`/`ungetc`.
+
+### msvcp140 lifted (2026-11-24)
+
+Decision (user): lift Microsoft's `msvcp140.dll` rather than write
+iostream HLE. The engine uses iostreams/locales (144 msvcp140 imports,
+inline template code on MSVC's exact layouts). The game's Steam
+redistributables stop at VC++ 2012, so `tools/redist.sh` downloads
+`VC_redist.x86.exe` once from Microsoft's versioned URL (SHA-256
+`0c09f261...ed64`, the hash is in the URL) and extracts `msvcp140.dll`
+14.44.35211.0 x86 (`97e71a3c...8165`) with bsdtar (WiX bundle -> cabinet
+-> MSI cabinet). Lifted at `0x12400000`: 2,363 Ghidra functions, data in
+`.text` as in D3DX. Its DllMain needed the "C" locale's UCRT data
+(`___lc_*`, `__pctype_func`, `_lock_locales`), `setlocale`, and
+`_get_stream_buffer_pointers` (answered with an empty buffer, so
+`std::filebuf` goes through stdio). The engine then creates a "C" locale
+(`_create_locale(LC_NUMERIC, "C")`) for `_atof_l`.
+
+### PhysX 2.x lifted (2026-11-24)
+
+`NxCreatePhysicsSDK` (PhysXLoader) is called during startup, so PhysX is
+lifted now rather than at milestone 6: `PhysXLoader.dll` (0x12500000,
+247 functions), `PhysXCooking.dll` (0x12600000, 866), `PhysXCore.dll`
+(0x12700000, 5,455), the game's own files (hashes pinned). PhysXCore
+imports `cudart32_30_9.dll` statically and registers its CUDA kernels at
+load (`__cudaRegisterFatBinary` ...): answered as on a machine with no
+CUDA device, so GPU physics stays off. Whole lift now: 129,912
+functions, 7.25M instructions.
+
+After PhysX: Steam HTTP (`ISteamHTTP` v003, a request at startup), then
+**OpenAL** (`alGetError` first). Decision (user): OpenAL 1.1 on
+x86recomp's own mixer (in progress). Trace: 1.14M lines.

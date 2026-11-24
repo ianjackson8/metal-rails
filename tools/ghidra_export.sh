@@ -1,7 +1,8 @@
 #!/bin/bash
-# ghidra_export.sh: auto-analyse RailWorks.exe, plugins/GameManagerVC.dll,
-# LocalisedStrings.dll and zlibwapi.dll
-# with Ghidra headless (once; the project lives in ghidra/, gitignored) and
+# ghidra_export.sh [module...]: auto-analyse RailWorks.exe,
+# plugins/GameManagerVC.dll, LocalisedStrings.dll, zlibwapi.dll and the
+# Microsoft redistributables lifted with them (d3dx9_43, msvcp140; see
+# tools/redist.sh) with Ghidra headless (once; the project lives in ghidra/, gitignored) and
 # export what the lifter needs into symbols/<module>/:
 #   functions.tsv, jumptables.tsv   (Ghidra, x86recomp's tools/ghidra scripts)
 #   exports.tsv, imports.tsv, pe_info.txt   (x86recomp's tools/pe_symbols.py)
@@ -26,8 +27,10 @@ mkdir -p "$P" "$L"
 
 # module dir, file in the game folder (or an absolute path, already
 # verified: the redistributable's d3dx9_43.dll), program name in the project
+only=("$@")  # module names to export (default: all)
 run() {
   local mod=$1 rel=$2 file prog
+  if [ ${#only[@]} -gt 0 ] && [[ ! " ${only[*]} " == *" $mod "* ]]; then return; fi
   prog=$(basename "$rel")
   if [ "${rel:0:1}" = / ]; then file=$rel; else file="$RAILWORKS_GAME_DIR/$rel"; check_hash "$rel"; fi
   mkdir -p "$here/symbols/$mod"
@@ -54,6 +57,10 @@ run railworks RailWorks.exe
 run gamemanager plugins/GameManagerVC.dll
 run localisedstrings LocalisedStrings.dll
 run zlibwapi zlibwapi.dll
+run physxloader PhysXLoader.dll
+run physxcooking PhysXCooking.dll
+run physxcore PhysXCore.dll
 "$here/tools/redist.sh"
-run d3dx9_43 "$("$here/tools/redist.sh" --path)"
+run d3dx9_43 "$("$here/tools/redist.sh" --path d3dx9_43)"
+run msvcp140 "$("$here/tools/redist.sh" --path msvcp140)"
 echo "== done $(date +%T)"

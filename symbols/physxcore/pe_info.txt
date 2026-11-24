@@ -1,0 +1,27 @@
+image_base 0x10000000  image_size 0x37f000  entry 0x1003febe  timestamp 0x4e13dc97
+relocations: yes
+sections:
+  .text    va 0x10001000 vsize  0x27fd40 raw  0x27fe00 chars 0x60000020
+  .rdata   va 0x10281000 vsize   0xc4818 raw   0xc4a00 chars 0x40000040
+  .data    va 0x10346000 vsize   0x1c2c8 raw    0x6200 chars 0xc0000040
+  .nvFatBi va 0x10363000 vsize     0x440 raw     0x600 chars 0xc0000040
+  .rsrc    va 0x10364000 vsize     0x554 raw     0x600 chars 0x40000040
+  .reloc   va 0x10365000 vsize   0x19f7a raw   0x1a000 chars 0x42000040
+imports per dll:
+  KERNEL32.dll   98
+  cudart32_30_9.dll 31
+  WSOCK32.dll    12
+  USER32.dll     1
+exports: 13 func=13
+rich header (prodid build count):
+  149 30729 36
+  131 30729 146
+  147 21022 2
+  132 30729 61
+  123 50727 7
+    1     0 156
+   96  3077 1
+  138 30729 435
+  146 30729 1
+  148 21022 1
+  145 30729 1

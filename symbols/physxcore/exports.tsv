@@ -1,0 +1,14 @@
+va	kind	mangled	demangled
+10097B90	func	AgPmEventLoggingEnabled	
+10097BB0	func	AgPmEventEnabled	
+10097BD0	func	AgPmSubmitEvent	
+10097C10	func	AgPmDestroySourceConnection	
+100DA460	func	NgCreateCoreSDK	
+10112760	func	NpGetUtilLib	
+101127A0	func	NxGetValue	
+101127E0	func	NpReleasePhysicsSDK	
+10112810	func	NpGetPhysicsSDK	
+10112820	func	NpGetFoundationSDK	
+10112830	func	NpGetPhysicsSDKAllocator	
+10114B50	func	NpCreatePhysicsSDK	
+101EAF40	func	NxCreateCoreSDK	

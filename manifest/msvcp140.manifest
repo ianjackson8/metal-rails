@@ -1,0 +1,4 @@
+# msvcp140.dll (Microsoft Visual C++ 14.44.35211.0, x86; SHA-256
+# 97e71a3c...8165, from VC_redist.x86.exe by tools/redist.sh): this port's
+# changes. Lifted at base 0x12400000 (it shares the engine's preferred
+# base); VAs here are at 0x10000000. Same grammar as railworks.manifest.
