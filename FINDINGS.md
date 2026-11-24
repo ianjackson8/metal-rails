@@ -739,3 +739,36 @@ faces, pointer and clicks working. What it took after the main loop:
 - Pointer: the game reads WM_MOUSEMOVE. x86recomp used its virtual
   cursor for every fullscreen-exclusive window, which drifted from the
   visible pointer; now only while the cursor is hidden or clipped.
+
+## Milestone 5: a scenario loads and drives (2026-11-24)
+
+Free Roam, Cajon Pass in Summer (EMD F7 Warbonnet, Victorville yard, the
+scenario where Wine fell to ~6 fps): loads, renders (terrain, track,
+rolling stock, sky, HUD), camera keys work, and the train drives; the
+user reports it as very smooth throughout (no fps measured yet).
+
+What loading needed beyond the menu:
+- Point-light shadow maps (`107E5660`): for each size in a table (largest
+  first) a 2D **and** a cube render target in R32F, X8R8G8B8 or R16F;
+  with none, the limit at `+0x85C` stays -1, and the setter at `107E2050`
+  later indexes record -1 (a memcpy of a garbage count). Needed cube
+  render targets in x86recomp.
+- Route tiles are named `+000031+000084.bin`, parsed with `sscanf("%d%d")`.
+- Two switches the export lacked: one on a loop counter (`10F45D30`, 6
+  cases, Ghidra listed 1) and unoptimised ones bounded through a stack
+  slot (`1094E333`, 8 cases, and 7 more), both now recovered by the lifter.
+- Effects set fixed-function lights (D3DX calls `LightEnable`); x86recomp
+  warns that fixed-function lighting with a pixel shader is not emulated.
+- `RailDriver.dll` missing is handled (`10BD5B38`: a NULL handle skips the
+  controller).
+
+Open:
+- **Plain track sometimes missing on the first load** (points/switches
+  drawn, straight and curved track not); loading the same scenario again
+  drew it all. Not the lifter: re-lifting changed only 8 switch sites.
+  Suspects: the game builds track meshes on worker threads (a race in
+  the D3D9 buffer path), or the shared buffer heap filling (256 MB, full
+  on every load so far).
+- A "junction switched against train" derailment while track was missing;
+  judge only with track drawn.
+- `d3dcompiler_43.dll` is asked for 10 times (not provided).
