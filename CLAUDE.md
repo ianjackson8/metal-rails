@@ -155,14 +155,25 @@ modules to add, D3DX effect framework surface, a still-patched target,
    `--module`; count unlifted/unresolved targets; check for static TLS
    (present, 8 bytes, no callbacks: needs an upstream runtime change).
    PhysX DLLs to be added as further modules.
-3. Startup trace: imports actually called at startup vs. HLE coverage
-   (the static inventory is done, FINDINGS.md); size the 32-bit
-   UCRT/VCRUNTIME/MSVCP140 work. Starts with the three small upstream
-   x86recomp changes (32-bit DLL static TLS, SSE2 saturating arithmetic,
-   `xinput1_4` alias).
-4. D3DX: usage measured (`ID3DXEffect` over fx_2_0 binaries); implement
-   the effect framework.
-5. Reach the main menu (Scaleform) before any 3D.
+3. **Done (2026-11-20).** Startup trace through the 32-bit
+   UCRT/VCRUNTIME, Steam bridge, fibers, to D3D9 device creation on
+   x86recomp's Metal renderer.
+4. **In progress.** Main menu (Scaleform) on screen, before any 3D:
+   Microsoft's `d3dx9_43` lifted from the player's DirectX redistributable
+   (effects, fonts via GDI on CoreText), audio (OpenAL), Scaleform UI.
+5. Load a route: a scenario's terrain, track, rolling stock, sky
+   (SilverLining), Lua scripts.
+6. Drive a train: input (keyboard, mouse, controllers; RailDriver and
+   TrackIR stubbed first), physics (lift the PhysX 2.x DLLs, GPU physics
+   off), cab views, HUD.
+7. Correct rendering: effects matching Windows across the game, visual
+   differences fixed, DLC content working.
+8. Performance: beat the Wine collapse (Cajon Pass / Victorville yard,
+   see "Why native"), with the speed path, LTO and PGO.
+9. Product: native launcher replacing the .NET one, Builder app /
+   installer, settings and saves.
+10. Optional: move to the x64 engine (`GameManagerVC64.dll`) for heavy
+    routes that exhaust the 32-bit address space.
 
 ## Why native and not Wine (measured)
 
