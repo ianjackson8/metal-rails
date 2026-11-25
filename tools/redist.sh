@@ -17,7 +17,7 @@
 #
 # Every file is checked against its SHA-256. Usage:
 #   redist.sh              fetch/extract what is missing
-#   redist.sh --path NAME  print where NAME (d3dx9_43, msvcp140) goes
+#   redist.sh --path NAME  print where NAME (d3dx9_43, msvcp140, d3dcompiler_43) goes
 set -euo pipefail
 here=$(cd "$(dirname "$0")/.." && pwd)
 [ -f "$here/tools/local.env" ] && . "$here/tools/local.env"
@@ -28,8 +28,8 @@ redist="$data/redist"
 
 if [ "${1:-}" = --path ]; then
   case "${2:-}" in
-    d3dx9_43|msvcp140) echo "$redist/$2.dll"; exit 0 ;;
-    *) echo "redist.sh --path d3dx9_43|msvcp140"; exit 2 ;;
+    d3dx9_43|msvcp140|d3dcompiler_43) echo "$redist/$2.dll"; exit 0 ;;
+    *) echo "redist.sh --path d3dx9_43|msvcp140|d3dcompiler_43"; exit 2 ;;
   esac
 fi
 
@@ -53,6 +53,32 @@ else
   [ "$got" = "$d3dx_sha" ] || { echo "redist.sh: d3dx9_43.dll is not the June 2010 x86 build (SHA-256 $got)"; exit 1; }
   cp "$tmp/d3dx/d3dx9_43.dll" "$redist/d3dx9_43.dll"
   echo "redist.sh: d3dx9_43.dll -> $redist/d3dx9_43.dll"
+fi
+
+# d3dcompiler_43.dll -------------------------------------------------------------
+# D3DX compiles HLSL through it (the engine builds its legacy materials'
+# shaders at run time). June 2010, x86, from the same DirectX
+# redistributable: its Jun2010_D3DCompiler_43_x86.cab, or a copy of the DLL
+# named by D3DCOMPILER_43 (one the DirectX installer put in a Windows).
+dc_sha=2f23182ec6f4889397ac4bf03d62536136c5bdba825c7d2c4ef08c827f3a8a1c
+if have d3dcompiler_43.dll "$dc_sha"; then
+  echo "redist.sh: d3dcompiler_43.dll present"
+else
+  : "${STEAM_REDIST_DIR:=${RAILWORKS_GAME_DIR:?set RAILWORKS_GAME_DIR}/../Steamworks Shared/_CommonRedist/DirectX/Jun2010}"
+  cab="$STEAM_REDIST_DIR/Jun2010_D3DCompiler_43_x86.cab"
+  mkdir "$tmp/dc"
+  if [ -n "${D3DCOMPILER_43:-}" ]; then
+    cp "$D3DCOMPILER_43" "$tmp/dc/D3DCompiler_43.dll"
+  elif [ -f "$cab" ]; then
+    (cd "$tmp/dc" && bsdtar -xf "$cab" D3DCompiler_43.dll)
+  else
+    echo "redist.sh: no $cab and no D3DCOMPILER_43 (a copy of Microsoft's June 2010 x86 d3dcompiler_43.dll)"
+    exit 1
+  fi
+  got=$(sha "$tmp/dc/D3DCompiler_43.dll")
+  [ "$got" = "$dc_sha" ] || { echo "redist.sh: d3dcompiler_43.dll is not the June 2010 x86 build (SHA-256 $got)"; exit 1; }
+  cp "$tmp/dc/D3DCompiler_43.dll" "$redist/d3dcompiler_43.dll"
+  echo "redist.sh: d3dcompiler_43.dll -> $redist/d3dcompiler_43.dll"
 fi
 
 # msvcp140.dll -----------------------------------------------------------------

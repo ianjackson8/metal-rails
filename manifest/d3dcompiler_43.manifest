@@ -1,0 +1,5 @@
+# d3dcompiler_43.dll (Microsoft, June 2010 DirectX redistributable, x86;
+# SHA-256 2f23182e...8a1c, put in the data folder by tools/redist.sh): this
+# port's changes. Lifted at base 0x12C00000 (it shares the engine's
+# preferred base); VAs here are at 0x10000000. Same grammar as
+# railworks.manifest.

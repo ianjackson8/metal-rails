@@ -33,13 +33,14 @@ check_hash data/SilverLining/vc143/win32/SilverLiningDirectX9-MT-DLL.dll
 "$here/tools/redist.sh"
 d3dx="$("$here/tools/redist.sh" --path d3dx9_43)"
 msvcp="$("$here/tools/redist.sh" --path msvcp140)"
+dcomp="$("$here/tools/redist.sh" --path d3dcompiler_43)"
 lift="${LIFTER:-$here/out/build/release/x86recomp/tools/lifter/recomp_lift}"
 [ -x "$lift" ] || { echo "build first (cmake --preset release && cmake --build --preset release): no $lift"; exit 1; }
-for m in railworks gamemanager localisedstrings zlibwapi physxloader physxcooking physxcore silverlining d3dx9_43 msvcp140; do
+for m in railworks gamemanager localisedstrings zlibwapi physxloader physxcooking physxcore silverlining d3dx9_43 msvcp140 d3dcompiler_43; do
   [ -f "$here/symbols/$m/functions.tsv" ] || { echo "no symbols/$m/functions.tsv: run tools/ghidra_export.sh"; exit 1; }
 done
 mkdir -p "$here/logs"
-echo "lift.sh: lifting RailWorks.exe, GameManagerVC.dll, LocalisedStrings.dll, zlibwapi.dll, PhysX (Loader, Cooking, Core), SilverLining DX9, d3dx9_43.dll, msvcp140.dll"
+echo "lift.sh: lifting RailWorks.exe, GameManagerVC.dll, LocalisedStrings.dll, zlibwapi.dll, PhysX (Loader, Cooking, Core), SilverLining DX9, d3dx9_43.dll, msvcp140.dll, d3dcompiler_43.dll"
 start=$(date +%s)
 set +e
 (cd "$RAILWORKS_GAME_DIR" && "$lift" \
@@ -55,6 +56,8 @@ set +e
     --manifest "$here/manifest/d3dx9_43.manifest" --base 12200000 \
   --module "$msvcp" --symbols "$here/symbols/msvcp140" \
     --manifest "$here/manifest/msvcp140.manifest" --base 12400000 \
+  --module "$dcomp" --symbols "$here/symbols/d3dcompiler_43" \
+    --manifest "$here/manifest/d3dcompiler_43.manifest" --base 12C00000 \
   --module PhysXLoader.dll --symbols "$here/symbols/physxloader" \
     --manifest "$here/manifest/physxloader.manifest" --base 12500000 \
   --module PhysXCooking.dll --symbols "$here/symbols/physxcooking" \

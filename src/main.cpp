@@ -91,13 +91,16 @@ int main(int argc, char** argv) {
   // tools/redist.sh (never shipped): D3DX (June 2010, x86, from the
   // player's Steam DirectX redistributable) at 0x12200000 and the C++
   // library msvcp140 (14.44, from Microsoft's VC++ redistributable) at
-  // 0x12400000.
+  // 0x12400000, and D3DX's HLSL compiler d3dcompiler_43 (June 2010, x86;
+  // the engine compiles its legacy materials' shaders at run time) at
+  // 0x12C00000.
   std::string data_dir;
   if (const char* x = std::getenv("XDG_DATA_HOME"); x && *x) data_dir = std::string(x) + "/railworks";
   else data_dir = std::string(std::getenv("HOME") ? std::getenv("HOME") : "") +
                   recomp::platform::kUserDataDir + "railworks";
   for (const auto& [name, base] : {std::pair<const char*, uint32_t>{"d3dx9_43.dll", 0x12200000},
-                                   {"msvcp140.dll", 0x12400000}}) {
+                                   {"msvcp140.dll", 0x12400000},
+                                   {"d3dcompiler_43.dll", 0x12C00000}}) {
     const std::string path = data_dir + "/redist/" + name;
     if (stat(path.c_str(), &st) != 0) {
       std::fprintf(stderr, "railworks: no %s: run tools/redist.sh\n", path.c_str());

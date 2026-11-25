@@ -64,4 +64,5 @@ run silverlining data/SilverLining/vc143/win32/SilverLiningDirectX9-MT-DLL.dll
 "$here/tools/redist.sh"
 run d3dx9_43 "$("$here/tools/redist.sh" --path d3dx9_43)"
 run msvcp140 "$("$here/tools/redist.sh" --path msvcp140)"
+run d3dcompiler_43 "$("$here/tools/redist.sh" --path d3dcompiler_43)"
 echo "== done $(date +%T)"

@@ -1,0 +1,18 @@
+va	kind	mangled	demangled
+10066B80	func	D3DDisassemble	
+10066BB0	func	D3DReflect	
+10066C10	func	D3DCreateBlob	
+10066C20	func	D3DCompile	
+10066F00	func	D3DAssemble	
+10067AD0	func	D3DPreprocess	
+10067EB0	func	D3DGetBlobPart	
+10067EE0	func	D3DGetDebugInfo	
+10068060	func	D3DGetInputSignatureBlob	
+10068080	func	D3DGetOutputSignatureBlob	
+100680B0	func	D3DGetInputAndOutputSignatureBlob	
+100680E0	func	D3DStripShader	
+100689C0	func	D3DCompressShaders	
+10068C20	func	D3DDecompressShaders	
+10068E40	func	D3DReturnFailure1	
+100776E0	func	D3DDisassemble10Effect	
+101E5379	func	DebugSetMute	
